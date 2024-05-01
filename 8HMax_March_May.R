@@ -1,6 +1,4 @@
 # Make a blank csv with name RESULT_FILE
-# having top row as 
-# "Date","Oz_Max","Site","Year"
 
 library(dplyr)
 library(tidyr)
@@ -95,11 +93,21 @@ print("Done printing all to RESULTS-Summer-All-Sites")
 #ggplot(data, aes(x=variety, y=note, fill=treatment)) + 
 #    geom_boxplot()
 
+c_names <- c("Date","Oz_Max","Site","Year")
 
-boxed <- read_csv('PATH_TO_RESULT_FILE',col_types="Ddcc")
+boxed <- read_csv('PATH_TO_RESULT_FILE', col_names = c_names, col_types="Ddcc")
 
 # https://r-graph-gallery.com/265-grouped-boxplot-with-ggplot2.html
 # https://stackoverflow.com/questions/46075788/ggplotgeom-boxplot-how-to-change-the-width-of-one-box-group-in-r#51251923
 
-ggplot(boxed, aes(x=Site, y=Oz_Max, fill=Year)) + 
+p0 <- ggplot(boxed, aes(x=Site, y=Oz_Max, fill=Year)) + 
     geom_boxplot(position = position_dodge2(preserve = "single"))
+
+p1 <- ggplot(boxed, aes(x=Site, y=Oz_Max, fill=Year)) + 
+    geom_boxplot(position = position_dodge2(preserve = "single")) +
+    facet_wrap(~Year)
+# one box per variety
+p2 <- ggplot(boxed, aes(x=Site, y=Oz_Max, fill=Year)) + 
+    geom_boxplot(position = position_dodge2(preserve = "single")) +
+    facet_wrap(~Site, scale="free")
+
