@@ -3,10 +3,22 @@ library(tidyr)
 library(readr)
 library(ggplot2)
 
-myPath <- 'PATH_TO_DATA'
+myPath <- 'DATA_PATH'
 myFiles <- list.files(myPath)
 
-result_file <- 'PATH_TO_RESULT'
+result_file <- 'DESC.csv_RESULT_PATH'
+#result_header <- c("Site_No","Year","Site_Board","PM2.5 (µg/m³)_N","PM2.5 (µg/m³)_Non_NA","PM2.5 (µg/m³)_Mean","PM2.5 (µg/m³)_SD",
+#	"PM10 (µg/m³)_N","PM10 (µg/m³)_Non_NA","PM10 (µg/m³)_Mean","PM10 (µg/m³)_SD",
+#	"NO (µg/m³)_N","NO (µg/m³)_Non_NA","NO (µg/m³)_Mean","NO (µg/m³)_SD",
+#	"NO2 (µg/m³)_N","NO2 (µg/m³)_Non_NA","NO2 (µg/m³)_Mean","NO2 (µg/m³)_SD",
+#	"NOx (ppb)_N","NOx (ppb)_Non_NA","NOx (ppb)_Mean","NOx (ppb)_SD",
+#	"CO (mg/m³)_N","CO (mg/m³)_Non_NA","CO (mg/m³)_Mean","CO (mg/m³)_SD",
+#	"Ozone (µg/m³)_N","Ozone (µg/m³)_Non_NA","Ozone (µg/m³)_Mean","Ozone (µg/m³)_SD",
+#	"RH (%)_N","RH (%)_Non_NA","RH (%)_Mean","RH (%)_SD",
+#	"SR (W/mt2)_N","SR (W/mt2)_Non_NA","SR (W/mt2)_Mean","SR (W/mt2)_SD",
+#	"AT (°C)_N","AT (°C)_Non_NA","AT (°C)_Mean","AT (°C)_SD",
+#	"VWS (m/s)_N","VWS (m/s)_Non_NA","VWS (m/s)_Mean","VWS (m/s)_SD")
+
 
 myCols <- c('Timestamp', 'PM2.5 (µg/m³)', 'PM10 (µg/m³)', 
 			'NO (µg/m³)', 'NO2 (µg/m³)', 'NOx (ppb)', 
@@ -29,30 +41,17 @@ analyze <- function(f) {
 	
 	urData <- myData %>%
 	summarise(across(
-		.cols = is.numeric, 
+		.cols = is.numeric | is.logical, 
 		.fns = list(N = Total_Obs, Non_NA = Non_NA_Obs, Mean = my.mean, SD = my.mean), 
 		.names = "{.col}_{.fn}"
 		))
-		
-	
-	
-	# Timestamp, Datetime processing
-	#myData$Samay <- with(myData,strptime(Timestamp, "%Y-%m-%d %H:%M:%S"))
-	#myData$myDate <- with(myData,as.Date(Timestamp))
-	#urData$Saal <- substr(myData$Timestamp[1],1,4)
-	#myData$Mahina <- with(myData,myData$Samay$mon)
 
 	return(urData)
 }
 
 
 for (f in myFiles) {	
-	f_result <- analyze(f)
-	
-	#fname <- strsplit(f,"_")[[1]][3:6]
-	#fname <- paste(unlist(fname), collapse='_')	
-	
-	
+	f_result <- analyze(f)	
 	
 	fname <- strsplit(f,"_")
 	
@@ -74,7 +73,7 @@ for (f in myFiles) {
 	f_result$Site_Board <- with(f_result, f_site_board)
 	
 	f_result <- f_result %>% relocate(Site_No, Year, Site_Board)
-	write.table(f_result, file = result_file, append = TRUE, row.names = FALSE, col.names = TRUE, sep = ",")
+	write.table(f_result, file = result_file, append = TRUE, row.names = FALSE, col.names = FALSE, sep = ",")
 	
 	
 	
