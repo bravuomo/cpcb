@@ -38,6 +38,7 @@ merged_df %>% ggplot(aes(x = Saal, y = `PM2.5 (µg/m³)`, group = Saal)) + geom_
 merged_df %>% ggplot(aes(x = Saal, y = `PM10 (µg/m³)`, group = Saal)) + geom_boxplot(fill="slateblue", alpha=0.2) + xlab('Year') + ylab('PM10 (µg/m³)') + facet_wrap(~ Site_No)
 merged_df %>% ggplot(aes(x = Saal, y = `Ozone (µg/m³)`, group = Saal)) + geom_boxplot(fill="slateblue", alpha=0.2) + xlab('Year') + ylab('Ozone (µg/m³)') + facet_wrap(~ Site_No)
 
+
 merged_df %>% ggplot(aes(x = Timestamp, y = `Ozone (µg/m³)`)) + geom_point(color = 'gray') + ylab('Ozone (µg/m³)') + 
 	geom_smooth( 
 		#aes(color = "y ~ x", fill = "y ~ x"),
@@ -49,3 +50,37 @@ merged_df %>% ggplot(aes(x = Timestamp, y = `Ozone (µg/m³)`)) + geom_point(col
 		#fullrange = FALSE) + # The fit spans the full range of the horizontal axis)
     theme_light() + 
     facet_wrap(~ Site_No)
+
+merged_df %>% ggplot(aes(x = Timestamp, y = `Ozone (µg/m³)`)) + geom_point(color = 'gray') + ylab('Ozone (µg/m³)') + 
+	geom_smooth(aes(fill = "red")) +
+		#aes(color = "y ~ x", fill = "y ~ x"),
+		#aes(fill = "red"),
+		#level = 0.90, 
+		#method = "lm") +
+		#formula = y~x, 
+		#se = TRUE, # Plot the line only (without confidence bands)
+		#fullrange = FALSE) + # The fit spans the full range of the horizontal axis)
+	stat_cor(p.accuracy = 0.001,#label.y = 300, 
+           aes(label = paste(..rr.label.., ..p.label.., sep = "~`,`~"))) +
+	stat_regline_equation(label.y.npc = 0.9) +
+
+    theme_light() + 
+    facet_wrap(~ Site_No)
+
+
+
+p.list = lapply(sort(unique(merged_df$Site_No)), function(i) {
+  i <- ggplot(merged_df[merged_df$Site_No==i,], aes(x = Saal, y = `Ozone (µg/m³)`, group = Saal)) +
+    geom_boxplot(fill="slateblue", alpha=0.2) +
+    xlab('Year') + 
+    ylab('Ozone (µg/m³)') +
+    facet_wrap(~ Site_No)
+})
+
+
+for (p in 1:length(p.list)) {
+    file_name = paste(p, ".jpg", sep="")
+    jpeg(file_name)
+    print(p.list[[p]])
+    dev.off()
+}
